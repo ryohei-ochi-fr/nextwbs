@@ -29,8 +29,6 @@ export class TasksController {
   }
 
   @Get(':taskName/:key')
-  @Header('content-type', 'application/xml; charset=UTF-8')
-  @UseInterceptors(XmlresponseInterceptor)
   async createId(
     @Param('taskName') taskname: string,
     @Param('key') key: string,
@@ -39,6 +37,27 @@ export class TasksController {
       name: taskname,
     };
     return await this.tasksService.createId(createTaskDto);
+  }
+
+  @Get(':taskId/:taskName/:person/:jsDate/:jeDate/:progress/:parent')
+  async updateTask(
+    @Param('taskId') taskid: string,
+    @Param('taskName') taskname: string,
+    @Param('person') person: string,
+    @Param('jsDate') jsDate: string,
+    @Param('jeDate') jeDate: string,
+    @Param('progress') progress: string,
+    @Param('parent') parent: number,
+  ): Promise<{ message: string }> {
+    const updateTaskDto: UpdateTaskDto = {
+      name: taskname,
+      person: person,
+      jsDate: jsDate,
+      jeDate: jeDate,
+      progress: progress,
+      parent: parent,
+    };
+    return await this.tasksService.updateTask(+taskid, updateTaskDto);
   }
 
   @Patch(':id')

@@ -19,6 +19,7 @@ export class TasksService {
     const task = await this.taskRepository
       .save({
         name: createTaskDto.name,
+        parent: 0,
       })
       .catch((e) => {
         throw new InternalServerErrorException(
@@ -41,6 +42,28 @@ export class TasksService {
         );
       });
     return { message: 'タスクの登録に成功しました。' };
+  }
+
+  async updateTask(
+    id: number,
+    updateTaskDto: UpdateTaskDto,
+  ): Promise<{ message: string }> {
+    if (!id) throw new NotFoundException('TaskID が指定されていません。');
+    await this.taskRepository
+      .update(id, {
+        name: updateTaskDto.name,
+        person: updateTaskDto.person,
+        jsDate: updateTaskDto.jsDate,
+        jeDate: updateTaskDto.jeDate,
+        progress: updateTaskDto.progress,
+        parent: updateTaskDto.parent,
+      })
+      .catch((e) => {
+        throw new InternalServerErrorException(
+          `[${e.message}]TaskID ${id} の更新に失敗しました。`,
+        );
+      });
+    return { message: `200` };
   }
 
   async update(
