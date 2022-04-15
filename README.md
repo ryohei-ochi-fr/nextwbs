@@ -37,4 +37,22 @@ npm i @nestjs/swagger swagger-ui-express --save
 ```
 
 
+```powershell
+これいらない？
+npm i xml --save
+npm i @types/xml --save
+npm uninstall @types/xml --save
+npm uninstall xml --save
+
+
+
+これだけでok？
+npm i xmljson --save
+npm uninstall xmljson --save
+
+
+npm i @types/xml2js --save
+```
+
+
 nest start --watch

@@ -6,15 +6,15 @@ import {
   Patch,
   Param,
   Delete,
-  Header,
   UseInterceptors,
+  Res,
 } from '@nestjs/common';
 import { TasksService } from './tasks.service';
 import { CreateTaskDto } from './dto/create-task.dto';
 import { UpdateTaskDto } from './dto/update-task.dto';
 import { Task } from './entities/task.entity';
 import { LoggingInterceptor } from 'src/interceptor/logging.interceptor';
-import { XmlresponseInterceptor } from 'src/interceptor/xmlresponse.interceptor';
+import { Response } from 'express';
 
 @UseInterceptors(LoggingInterceptor)
 @Controller('tasks')
@@ -37,6 +37,22 @@ export class TasksController {
       name: taskname,
     };
     return await this.tasksService.createId(createTaskDto);
+  }
+
+  @Get('/xml/:taskName/:key')
+  async createIdXml(
+    @Param('taskName') taskname: string,
+    @Param('key') key: string,
+    @Res() res: Response,
+  ) {
+    const createTaskDto: CreateTaskDto = {
+      name: taskname,
+    };
+
+    const json = await this.tasksService.createId(createTaskDto);
+
+    res.set('Content-Type', 'text/xml; charset=UTF-8');
+    res.send('<result><taskId>' + json.taskId + '</taskId></result>');
   }
 
   @Get(':taskId/:taskName/:person/:jsDate/:jeDate/:progress/:parent')
@@ -73,10 +89,10 @@ export class TasksController {
     return await this.tasksService.findAll();
   }
 
-  @Get(':id')
-  async findOne(@Param('id') id: string): Promise<Task> {
-    return await this.tasksService.findOne(+id);
-  }
+  // @Get(':id')
+  // async findOne(@Param('id') id: string): Promise<Task> {
+  //   return await this.tasksService.findOne(+id);
+  // }
 
   @Delete(':id')
   remove(@Param('id') id: string) {
