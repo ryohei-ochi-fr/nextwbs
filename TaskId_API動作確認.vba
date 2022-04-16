@@ -42,7 +42,7 @@ Private Sub Worksheet_SelectionChange(ByVal Target As Range)
 
     ' TaskName 列(名前付きセル範囲)の 選択時 最終行を格納する
     slrTaskName = Cells(Rows.Count, Range("TaskName").Column).End(xlUp).Row
-    Call Logger(L_DEBUG, "TaskId 列の最終行 = " & slrTaskName)
+    Call Logger(L_DEBUG, "TaskName 列の最終行 = " & slrTaskName)
     Cells(3, 4) = slrTaskName
 
 End Sub

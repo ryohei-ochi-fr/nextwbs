@@ -74,7 +74,7 @@ export class TasksController {
       progress: progress,
       parent: parent,
     };
-    
+
     const json = await this.tasksService.updateTask(+taskid, updateTaskDto);
 
     res.set('Content-Type', 'text/xml; charset=UTF-8');
@@ -113,6 +113,11 @@ export class TasksController {
   @Get()
   async findAll(): Promise<Task[]> {
     return await this.tasksService.findAll();
+  }
+
+  @Get('/emergency')
+  async findAllParentIs10(): Promise<Task[]> {
+    return await this.tasksService.findAllParentIs10();
   }
 
   // @Get(':id')
