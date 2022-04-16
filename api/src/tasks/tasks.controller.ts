@@ -55,6 +55,32 @@ export class TasksController {
     res.send('<result><taskId>' + json.taskId + '</taskId></result>');
   }
 
+  @Get('/xml/:taskId/:taskName/:person/:jsDate/:jeDate/:progress/:parent')
+  async updateTaskXml(
+    @Param('taskId') taskid: string,
+    @Param('taskName') taskname: string,
+    @Param('person') person: string,
+    @Param('jsDate') jsDate: string,
+    @Param('jeDate') jeDate: string,
+    @Param('progress') progress: string,
+    @Param('parent') parent: number,
+    @Res() res: Response,
+  ) {
+    const updateTaskDto: UpdateTaskDto = {
+      name: taskname,
+      person: person,
+      jsDate: jsDate,
+      jeDate: jeDate,
+      progress: progress,
+      parent: parent,
+    };
+    
+    const json = await this.tasksService.updateTask(+taskid, updateTaskDto);
+
+    res.set('Content-Type', 'text/xml; charset=UTF-8');
+    res.send('<result><code>' + json.message + '</code></result>');
+  }
+
   @Get(':taskId/:taskName/:person/:jsDate/:jeDate/:progress/:parent')
   async updateTask(
     @Param('taskId') taskid: string,

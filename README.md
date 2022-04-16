@@ -55,4 +55,11 @@ npm i @types/xml2js --save
 ```
 
 
+```powershell
 nest start --watch
+```
+
+# excel
+
+=IFERROR(FILTERXML(WEBSERVICE(CONCATENATE("http://localhost:3000/tasks/",J2,"/",D2,"/",E2,"/",F2,"/",G2,"/",H2,"/",I2)),"//data/status"),"")
+=FILTERXML(WEBSERVICE(CONCATENATE("http://",$B$2,":",$B$3,"/api/",$B$4,"/getTaskId/","新規","/",A11)),"//data/id")
