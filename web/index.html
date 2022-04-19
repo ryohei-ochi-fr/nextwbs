@@ -8,10 +8,6 @@
             <div id="emergency"></div>
         </div>
         <div>
-            <h1>残タスク</h1>
-            <div id="todayTasks"></div>
-        </div>
-        <div>
             <h1>天気概況</h1>
             <table>
                 <tr id="publishingOffice">
@@ -36,6 +32,10 @@
                 </tr>
             </table>
 
+        </div>
+        <div>
+            <h1>残タスク</h1>
+            <div id="todayTasks"></div>
         </div>
     </body>
     <script>
@@ -70,7 +70,7 @@ function getWeather34() {
 }
 
 function getEmergency() {
-  var url = 'http://localhost:3000/tasks/emergency';
+  var url = 'http://' + location.hostname + ':3000/tasks/emergency';
   fetch(url)
   .then(function (data) {
     return data.json();
@@ -98,7 +98,7 @@ function getEmergency() {
 
 
 function getTodayTasks() {
-  var url = 'http://localhost:3000/tasks';
+  var url = 'http://' + location.hostname + ':3000/tasks';
   fetch(url)
   .then(function (data) {
     return data.json();
