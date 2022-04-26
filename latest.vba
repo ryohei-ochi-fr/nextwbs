@@ -8,6 +8,7 @@ Dim ServerIP As String
 Dim ServerPort As String
 Dim TaskIdIssue As Boolean
 Dim TaskIdProtect As Boolean
+Dim TaskIdDelete As Boolean
 
 Dim editTaskId As Boolean
 Dim editTaskName As Boolean
@@ -34,10 +35,9 @@ Enum LOGLEVEL
 End Enum
 
 Private Sub Worksheet_SelectionChange(ByVal Target As Range)
-
-    ServerIP = Worksheets("環境設定").Range("ServerIP").Value
-    ServerPort = Worksheets("環境設定").Range("ServerPort").Value
     
+    TaskIdProtect = Worksheets("環境設定").Range("TaskIdProtect").Value
+
     
     Call Logger(L_INFO, ServerIP)
     Call Logger(L_INFO, "TaskId 列を colTaskId へ格納")
@@ -45,7 +45,7 @@ Private Sub Worksheet_SelectionChange(ByVal Target As Range)
     debugLogLevel = L_ERROR
 
     
-    If DEBUG_OFF Then
+    If TaskIdProtect Then
     
         debugLogLevel = L_INFO
     
@@ -68,7 +68,14 @@ Private Sub Worksheet_SelectionChange(ByVal Target As Range)
 End Sub
 
 Private Sub Worksheet_Change(ByVal Target As Range)
-    If DEBUG_OFF Then
+    ServerIP = Worksheets("環境設定").Range("ServerIP").Value
+    ServerPort = Worksheets("環境設定").Range("ServerPort").Value
+    
+    TaskIdProtect = Worksheets("環境設定").Range("TaskIdProtect").Value
+    TaskIdIssue = Worksheets("環境設定").Range("TaskIdIssue").Value
+    TaskIdDelete = Worksheets("環境設定").Range("TaskIdDelete").Value
+    
+    If TaskIdProtect Then
     
         editTaskId = True
         editTaskName = True
@@ -92,24 +99,30 @@ Private Sub Worksheet_Change(ByVal Target As Range)
         Application.EnableEvents = False
         
         On Error GoTo ENDCODE
+        
+        ' todo TaskIdが空なら発番
+        
     
-        If editTaskName Then
+        If editTaskName And Not editTaskId Then
             ' TaskName 列(名前付きセル範囲)の 編集後 最終行を格納する
             chrTaskName = Cells(Rows.Count, Range("TaskName").Column).End(xlUp).Row
             Call Logger(L_DEBUG, "TaskName 列の最終行 = " & chrTaskName)
             
             If slrTaskName < chrTaskName Then
             
-                ' 行数増加
-                For i = 0 To Target.Rows.Count - 1
-                
-                    If Cells(Target.Row + i, Range("TaskId").Column) = "" Then
-                        res = getTaskId()
+                If TaskIdIssue Then
+    
+                    ' 行数増加
+                    For i = 0 To Target.Rows.Count - 1
                     
-                        Cells(Target.Row + i, Range("TaskId").Column) = _
-                            WorksheetFunction.FilterXML(res, "/result/taskId")
-                    End If
-                Next
+                        If Cells(Target.Row + i, Range("TaskId").Column) = "" Then
+                            res = getTaskId()
+                        
+                            Cells(Target.Row + i, Range("TaskId").Column) = _
+                                WorksheetFunction.FilterXML(res, "/result/taskId")
+                        End If
+                    Next
+                End If
             End If
         End If
         
@@ -122,33 +135,47 @@ Private Sub Worksheet_Change(ByVal Target As Range)
             
             ' 行変化の判定
             If slrTaskId = chrTaskId Then
-                ' 行数変化なし
-                Call Logger(L_INFO, "【判定】TaskId 行数変化なし" & "")
                 
-                For i = 0 To Target.Rows.Count - 1
-                    Cells(Target.Row + i, Range("TaskId").Column) = colTaskId(Target.Row + i, 1)
-                Next i
+                If TaskIdProtect Then
+                
+                    ' 行数変化なし
+                    Call Logger(L_INFO, "【判定】TaskId 行数変化なし" & "")
+                    
+                    For i = 0 To Target.Rows.Count - 1
+                        Cells(Target.Row + i, Range("TaskId").Column) = colTaskId(Target.Row + i, 1)
+                    Next i
+                
+                End If
+
             Else
                 If slrTaskId < chrTaskId Then
-                    ' 行数増加
-                    For i = 0 To Target.Rows.Count - 1
                     
-                        res = getTaskId()
-                    
-                        Cells(Target.Row + i, Range("TaskId").Column) = _
-                            WorksheetFunction.FilterXML(res, "/result/taskId")
-                    
-                    Next
+                    If TaskIdIssue Then
+                        
+                        ' 行数増加
+                        For i = 0 To Target.Rows.Count - 1
+                        
+                            res = getTaskId()
+                        
+                            Cells(Target.Row + i, Range("TaskId").Column) = _
+                                WorksheetFunction.FilterXML(res, "/result/taskId")
+                        
+                        Next
+                    End If
                 Else
-                    ' 行数減少
-                    For i = 0 To Target.Rows.Count - 1
                     
-                        If colTaskId(Target.Row + i, Range("TaskId").Column) <> "" Then
-                    
-                            res = deleteTaskId(colTaskId(Target.Row + i, Range("TaskId").Column))
-                            
-                        End If
-                    Next
+                    If TaskIdDelete Then
+    
+                        ' 行数減少
+                        For i = 0 To Target.Rows.Count - 1
+                        
+                            If colTaskId(Target.Row + i, 1) <> "" Then
+                        
+                                res = deleteTaskId(colTaskId(Target.Row + i, 1))
+                                
+                            End If
+                        Next
+                    End If
                 End If
             End If
                 
@@ -212,12 +239,3 @@ Private Sub Logger(ByVal level As LOGLEVEL, ByVal massage As String)
     End If
     
 End Sub
-
-
-
-
-
-
-
-
-
