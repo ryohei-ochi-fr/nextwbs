@@ -1,7 +1,6 @@
 Option Explicit
 
-' TaskId 列を編集するデバッグ時に false とする
-Const DEBUG_OFF As Boolean = True
+' rev.012
 
 Dim httpReq As New XMLHTTP60   '「Microsoft XML, v6.0」を参照設定
 Dim ServerIP As String

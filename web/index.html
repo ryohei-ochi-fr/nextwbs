@@ -1,54 +1,109 @@
+<!DOCTYPE html>
 <html>
-    <link href="dist/css/tabulator_modern.min.css" rel="stylesheet">
-    <script type="text/javascript" src="dist/js/tabulator.min.js"></script>
+    <head>
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <link href="dist/css/tabulator_modern.min.css" rel="stylesheet">
+        <script type="text/javascript" src="dist/js/tabulator.min.js"></script>
+        <link href="01_style.css" rel="stylesheet">
+    </head>
 
     <body>
-        <div>
-            <h1>緊急タスク</h1>
-            <div id="emergency"></div>
-        </div>
-        <div>
-            <h1>天気概況</h1>
-            <table>
-                <tr id="publishingOffice">
-                    <th>発表者</th>
-                    <td></td>
-                </tr>
-                <tr id="reportDatetime">
-                    <th>報告日時</th>
-                    <td></td>
-                </tr>
-                <!-- <tr id="targetArea">
-                    <th>対象地域</th>
-                    <td></td>
-                </tr>
-                <tr id="headlineText">
-                    <th>ヘッドライン</th>
-                    <td></td>
-                </tr> -->
-                <tr id="text">
-                    <th>詳細</th>
-                    <td></td>
-                </tr>
-            </table>
+        <div class="tabs">
+            <input id="all" type="radio" name="tab_item">
+            <label class="tab_item" for="all">緊急タスク</label>
 
-        </div>
+            <input id="programming" type="radio" name="tab_item" checked>
+            <label class="tab_item" for="programming">残タスク</label>
+
+            <input id="person" type="radio" name="tab_item">
+            <label class="tab_item" for="person">担当順</label>
+
+            <input id="design" type="radio" name="tab_item">
+            <label class="tab_item" for="design">天気概況</label>
+
+            <div class="tab_content" id="all_content">
+              <div class="tab_content_description">
+                <p class="c-txtsp">緊急タスクの内容がここに入ります</p>
+                <div id="emergency"></div>
+              </div>
+            </div>
+
+            <div class="tab_content" id="programming_content">
+              <div class="tab_content_description">
+                <p class="c-txtsp">残タスクの内容がここに入ります</p>
+                <div id="todayTasks"></div>
+              </div>
+            </div>
+
+            <div class="tab_content" id="person_content">
+                <div class="tab_content_description">
+                    <p class="c-txtsp">担当順の内容がここに入ります</p>
+                    <div id="personTasks"></div>
+                </div>
+            </div>
+
+            <div class="tab_content" id="design_content">
+              <div class="tab_content_description">
+                <p class="c-txtsp">天気概況の内容がここに入ります</p>
+                <table>
+                    <tr id="publishingOffice">
+                        <th>発表者</th>
+                        <td></td>
+                    </tr>
+                    <tr id="reportDatetime">
+                        <th>報告日時</th>
+                        <td></td>
+                    </tr>
+                    <!-- <tr id="targetArea">
+                        <th>対象地域</th>
+                        <td></td>
+                    </tr>
+                    <tr id="headlineText">
+                        <th>ヘッドライン</th>
+                        <td></td>
+                    </tr> -->
+                    <tr id="text">
+                        <th>詳細</th>
+                        <td></td>
+                    </tr>
+                </table>
+              </div>
+            </div>
+          </div>
         <div>
-            <h1>残タスク</h1>
-            <div id="todayTasks"></div>
-        </div>
     </body>
     <script>
 
 var jsonRequest = function() {
     getTodayTasks();
+    getPersonTasks();
     getEmergency();
     getWeather34();
 }
 
+var loopTab = function() {
+    let elements = document.getElementsByName('tab_item');
+    let len = elements.length;
+    let checkValue = '';
+    // elements.item(0).checked = true;
+
+    for (let i = 0; i < len; i++){
+        if (elements.item(i).checked){
+            elements.item(i).checked = false;
+            if (i+1 < len) {
+                elements.item(i+1).checked = true;
+                break;
+            }else{
+                elements.item(0).checked = true;
+                break;
+            }
+        }
+    }
+}
 window.addEventListener('load', function() {
     jsonRequest();
-    time = setInterval(jsonRequest, 60 * 1000);
+    time1 = setInterval(jsonRequest, 60 * 3 * 1000);
+    time2 = setInterval(loopTab, 30 * 1000);
 });
 
 function getWeather34() {
@@ -82,7 +137,7 @@ function getEmergency() {
             // autoColumns: true,
             columns:[
             {title:"TaskId", field:"id", formatter:"plaintext"},
-            {title:"タスク名", field:"name", formatter:"plaintext", width:300},
+            {title:"タスク名", field:"name", formatter:"plaintext", width:450},
             {title:"担当", field:"person", formatter:"plaintext", hozAlign:"center"},
             {title:"開始日", field:"jsDate", formatter:"plaintext", hozAlign:"center"},
             {title:"終了日", field:"jeDate", formatter:"plaintext", hozAlign:"center"},
@@ -111,7 +166,35 @@ function getTodayTasks() {
             // autoColumns: true,
             columns:[
             {title:"TaskId", field:"id", formatter:"plaintext"},
-            {title:"タスク名", field:"name", formatter:"plaintext", width:300},
+            {title:"タスク名", field:"name", formatter:"plaintext", width:450},
+            {title:"担当", field:"person", formatter:"plaintext", hozAlign:"center"},
+            {title:"開始日", field:"jsDate", formatter:"plaintext", hozAlign:"center"},
+            {title:"終了日", field:"jeDate", formatter:"plaintext", hozAlign:"center"},
+            {title:"親タスク", field:"parent", formatter:"plaintext", hozAlign:"center"},
+            {title:"進捗", field:"progress", formatter:"plaintext", hozAlign:"right"},
+            // {title:"進捗", field:"progress", formatter:"progress", formatterParams:{color:["#00dd00", "orange", "rgb(255,0,0)"]}, sorter:"number", width:100},
+        ],
+        });
+ 
+        // table.setFilter("person", "!=", "");
+  });
+}
+
+function getPersonTasks() {
+  var url = 'http://' + location.hostname + ':3000/tasks';
+  fetch(url)
+  .then(function (data) {
+    return data.json();
+  })
+  .then(function (json) {
+        //initialize table
+        var table = new Tabulator("#personTasks", {
+            data: json,
+            groupBy:"person",
+            // autoColumns: true,
+            columns:[
+            {title:"TaskId", field:"id", formatter:"plaintext"},
+            {title:"タスク名", field:"name", formatter:"plaintext", width:450},
             {title:"担当", field:"person", formatter:"plaintext", hozAlign:"center"},
             {title:"開始日", field:"jsDate", formatter:"plaintext", hozAlign:"center"},
             {title:"終了日", field:"jeDate", formatter:"plaintext", hozAlign:"center"},
