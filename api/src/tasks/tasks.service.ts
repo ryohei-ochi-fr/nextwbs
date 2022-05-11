@@ -120,4 +120,17 @@ export class TasksService {
     if (!id) throw new NotFoundException('TaskID が指定されていません。');
     return await this.taskRepository.findOne(id);
   }
+  async findPerson(person: string): Promise<Task[]> {
+    return await this.taskRepository.query(
+      'select id, name, person' +
+        ", strftime('%m/%d', date('2022-04-01', printf('%d days',jsDate - 44652))) as jsDate" +
+        ", strftime('%m/%d', date('2022-04-01', printf('%d days',jeDate - 44652))) as jeDate" +
+        ", printf('%d%',progress * 100) as progress" +
+        ', parent ' +
+        'from tasks ' +
+        "where person = '" +
+        person +
+        "'",
+    );
+  }
 }

@@ -129,4 +129,12 @@ export class TasksController {
   remove(@Param('id') id: string) {
     return this.tasksService.remove(+id);
   }
+
+  @Get('/person/:person/:key')
+  async findPerson(
+    @Param('person') person: string,
+    @Param('key') key: string,
+  ): Promise<Task[]> {
+    return await this.tasksService.findPerson(person);
+  }
 }

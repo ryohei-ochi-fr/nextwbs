@@ -18,6 +18,9 @@
             <input id="person" type="radio" name="tab_item">
             <label class="tab_item" for="person">担当順</label>
 
+            <input id="person_morino" type="radio" name="tab_item">
+            <label class="tab_item" for="person_morino">森野</label>
+
             <input id="design" type="radio" name="tab_item">
             <label class="tab_item" for="design">天気概況</label>
 
@@ -41,6 +44,13 @@
                     <div id="personTasks"></div>
                 </div>
             </div>
+
+            <div class="tab_content" id="person_morino_content">
+              <div class="tab_content_description">
+                  <p class="c-txtsp">担当順の内容がここに入ります</p>
+                  <div id="personMorinoTasks"></div>
+              </div>
+          </div>
 
             <div class="tab_content" id="design_content">
               <div class="tab_content_description">
@@ -79,6 +89,7 @@ var jsonRequest = function() {
     getPersonTasks();
     getEmergency();
     getWeather34();
+    getPersonMorinoTasks();
 }
 
 var loopTab = function() {
@@ -189,6 +200,34 @@ function getPersonTasks() {
   .then(function (json) {
         //initialize table
         var table = new Tabulator("#personTasks", {
+            data: json,
+            groupBy:"person",
+            // autoColumns: true,
+            columns:[
+            {title:"TaskId", field:"id", formatter:"plaintext"},
+            {title:"タスク名", field:"name", formatter:"plaintext", width:450},
+            {title:"担当", field:"person", formatter:"plaintext", hozAlign:"center"},
+            {title:"開始日", field:"jsDate", formatter:"plaintext", hozAlign:"center"},
+            {title:"終了日", field:"jeDate", formatter:"plaintext", hozAlign:"center"},
+            {title:"親タスク", field:"parent", formatter:"plaintext", hozAlign:"center"},
+            {title:"進捗", field:"progress", formatter:"plaintext", hozAlign:"right"},
+            // {title:"進捗", field:"progress", formatter:"progress", formatterParams:{color:["#00dd00", "orange", "rgb(255,0,0)"]}, sorter:"number", width:100},
+        ],
+        });
+ 
+        // table.setFilter("person", "!=", "");
+  });
+}
+
+function getPersonMorinoTasks() {
+  var url = 'http://' + location.hostname + ':3000/tasks/person/%E6%A3%AE%E9%87%8E/key';
+  fetch(url)
+  .then(function (data) {
+    return data.json();
+  })
+  .then(function (json) {
+        //initialize table
+        var table = new Tabulator("#personMorinoTasks", {
             data: json,
             groupBy:"person",
             // autoColumns: true,
